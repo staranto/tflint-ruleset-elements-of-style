@@ -9,8 +9,8 @@ import (
 func main() {
 	plugin.Serve(&plugin.ServeOpts{
 		RuleSet: &tflint.BuiltinRuleSet{
-			Name:    "template",
-			Version: "0.1.0",
+			Name:    "type-echo",
+			Version: "0.2.0",
 			Rules: []tflint.Rule{
 				rules.NewTypeEchoRule(),
 			},
