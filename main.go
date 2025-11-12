@@ -10,7 +10,7 @@ func main() {
 	plugin.Serve(&plugin.ServeOpts{
 		RuleSet: &tflint.BuiltinRuleSet{
 			Name:    "type-echo",
-			Version: "0.2.0",
+			Version: "0.2.1",
 			Rules: []tflint.Rule{
 				rules.NewTypeEchoRule(),
 			},

@@ -62,11 +62,15 @@ func checkForEcho(runner tflint.Runner, r *TypeEchoRule, block *hclext.Block, ty
 	logger.Debug(fmt.Sprintf("echo=%v for type='%s' name='%s'", echo, typ, name))
 
 	if echo {
+		logger.Debug(fmt.Sprintf("emiting issue for type='%s' name='%s'", typ, name))
 		runner.EmitIssueWithFix(
 			r,
 			fmt.Sprintf("The type \"%s\" is echoed in the label \"%s\"", typ, name),
 			block.DefRange,
-			func(f tflint.Fixer) error { return f.RemoveExtBlock(block) },
+			func(f tflint.Fixer) error {
+				logger.Debug(fmt.Sprintf("error func for type='%s' name='%s'", typ, name))
+				return f.RemoveExtBlock(block)
+			},
 		)
 	}
 }
