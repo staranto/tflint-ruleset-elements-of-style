@@ -1,3 +1,6 @@
+// Copyright (c) 2025 Steve Taranto <staranto@gmail.com>.
+// SPDX-License-Identifier: Apache-2.0
+
 package rules
 
 import (
@@ -9,11 +12,47 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
-// Check checks whether ...
+// TypeEchoRule checks whether a block's type is echoed in its name.
+type TypeEchoRule struct {
+	tflint.DefaultRule
+}
+
+// Check checks whether the rule conditions are met.
 func (r *TypeEchoRule) Check(runner tflint.Runner) error {
 	return r.walkModules(runner)
 }
 
+// Enabled returns whether the rule is enabled by default
+func (r *TypeEchoRule) Enabled() bool {
+	return true
+}
+
+// Link returns the rule reference link
+func (r *TypeEchoRule) Link() string {
+	return "https://www.example.com/blah"
+}
+
+// Name returns the rule name.
+func (r *TypeEchoRule) Name() string {
+	return "type_echo"
+}
+
+// Severity returns the rule severity
+func (r *TypeEchoRule) Severity() tflint.Severity {
+	return tflint.WARNING
+}
+
+// NewTypeEchoRule returns a new rule.
+func NewTypeEchoRule() *TypeEchoRule {
+	return &TypeEchoRule{}
+}
+
+// typeEchoRuleConfig represents the configuration for the TypeEchoRule.
+type typeEchoRuleConfig struct {
+	// Ignore provider prefix
+}
+
+// walkModules walks through the modules and checks for type echoes.
 func (r *TypeEchoRule) walkModules(runner tflint.Runner) error {
 	body, err := runner.GetModuleContent(&hclext.BodySchema{
 		Blocks: []hclext.BlockSchema{
@@ -48,6 +87,7 @@ func (r *TypeEchoRule) walkModules(runner tflint.Runner) error {
 	return nil
 }
 
+// checkForEcho checks if the type is echoed in the name.
 func checkForEcho(runner tflint.Runner, r *TypeEchoRule, block *hclext.Block, typ string, name string) {
 	echo := false
 
@@ -63,44 +103,10 @@ func checkForEcho(runner tflint.Runner, r *TypeEchoRule, block *hclext.Block, ty
 
 	if echo {
 		logger.Debug(fmt.Sprintf("emiting issue for type='%s' name='%s'", typ, name))
-		runner.EmitIssueWithFix(
+		runner.EmitIssue(
 			r,
 			fmt.Sprintf("The type \"%s\" is echoed in the label \"%s\"", typ, name),
 			block.DefRange,
-			func(f tflint.Fixer) error {
-				logger.Debug(fmt.Sprintf("error func for type='%s' name='%s'", typ, name))
-				return f.RemoveExtBlock(block)
-			},
 		)
 	}
-}
-
-// TypeEchoRule checks whether ...
-type TypeEchoRule struct {
-	tflint.DefaultRule
-}
-
-// NewTypeEchoRule returns a new rule
-func NewTypeEchoRule() *TypeEchoRule {
-	return &TypeEchoRule{}
-}
-
-// Name returns the rule name
-func (r *TypeEchoRule) Name() string {
-	return "type_echo"
-}
-
-// Enabled returns whether the rule is enabled by default
-func (r *TypeEchoRule) Enabled() bool {
-	return true
-}
-
-// Severity returns the rule severity
-func (r *TypeEchoRule) Severity() tflint.Severity {
-	return tflint.WARNING
-}
-
-// Link returns the rule reference link
-func (r *TypeEchoRule) Link() string {
-	return "https://www.google.com"
 }
