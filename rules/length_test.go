@@ -29,8 +29,8 @@ func TestLengthRule(t *testing.T) {
 					Message: "'very_long_instance_name_that_exceeds_limit' is 42 characters and should not be longer than 16",
 					Range: hcl.Range{
 						Filename: "main.tf",
-						Start:    hcl.Pos{Line: 11, Column: 1},
-						End:      hcl.Pos{Line: 11, Column: 69},
+						Start:    hcl.Pos{Line: 13, Column: 1},
+						End:      hcl.Pos{Line: 13, Column: 69},
 					},
 				},
 			},
