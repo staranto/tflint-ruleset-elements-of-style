@@ -1,7 +1,6 @@
-# TFLint Ruleset Template
-[![Build Status](https://github.com/terraform-linters/tflint-ruleset-type-echo/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/terraform-linters/tflint-ruleset-type-echo/actions)
+# TFLint Ruleset: Elements of Style
 
-This is a template repository for building a custom ruleset. You can create a plugin repository from "Use this template". See also [Writing Plugins](https://github.com/terraform-linters/tflint/blob/master/docs/developer-guide/plugins.md).
+This is a custom TFLint ruleset that enforces idiomatic conventions and style guidelines for Terraform configurations, promoting "elements of style" in infrastructure as code.
 
 ## Requirements
 
@@ -10,24 +9,14 @@ This is a template repository for building a custom ruleset. You can create a pl
 
 ## Installation
 
-TODO: This template repository does not contain release binaries, so this installation will not work. Please rewrite for your repository. See the "Building the plugin" section to get this template ruleset working.
-
 You can install the plugin with `tflint --init`. Declare a config in `.tflint.hcl` as follows:
 
 ```hcl
-plugin "template" {
+plugin "elements-of-style" {
   enabled = true
 
   version = "0.1.0"
-  source  = "github.com/terraform-linters/tflint-ruleset-type-echo"
-
-  signing_key = <<-KEY
-  -----BEGIN PGP PUBLIC KEY BLOCK-----
-  mQINBGCqS2YBEADJ7gHktSV5NgUe08hD/uWWPwY07d5WZ1+F9I9SoiK/mtcNGz4P
-  JLrYAIUTMBvrxk3I+kuwhp7MCk7CD/tRVkPRIklONgtKsp8jCke7FB3PuFlP/ptL
-  SlbaXx53FCZSOzCJo9puZajVWydoGfnZi5apddd11Zw1FuJma3YElHZ1A1D2YvrF
-  ...
-  KEY
+  source  = "github.com/staranto/tflint-ruleset-elements-of-style"
 }
 ```
 
@@ -35,10 +24,9 @@ plugin "template" {
 
 |Name|Description|Severity|Enabled|Link|
 | --- | --- | --- | --- | --- |
-|aws_instance_example_type|Example rule for accessing and evaluating top-level attributes|ERROR|✔||
-|aws_s3_bucket_example_lifecycle_rule|Example rule for accessing top-level/nested blocks and attributes under the blocks|ERROR|✔||
-|google_compute_ssl_policy|Example rule with a custom rule config|WARNING|✔||
-|terraform_backend_type|Example rule for accessing other than resources|ERROR|✔||
+|eos_type_echo|Disallow type echoing in block labels|WARNING|✔|[Link](docs/rules/eos_type_echo.md)|
+|eos_length|Disallow block labels longer than configurable length (default 16)|WARNING|✔|[Link](docs/rules/eos_length.md)|
+|eos_shout|Disallow all-uppercase block labels|WARNING|✔|[Link](docs/rules/eos_shout.md)|
 
 ## Building the plugin
 
@@ -58,7 +46,7 @@ You can run the built plugin like the following:
 
 ```
 $ cat << EOS > .tflint.hcl
-plugin "template" {
+plugin "elements-of-style" {
   enabled = true
 }
 EOS

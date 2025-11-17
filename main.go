@@ -1,3 +1,6 @@
+// Copyright (c) 2025 Steve Taranto <staranto@gmail.com>.
+// SPDX-License-Identifier: Apache-2.0
+
 package main
 
 import (
@@ -9,8 +12,8 @@ import (
 func main() {
 	plugin.Serve(&plugin.ServeOpts{
 		RuleSet: &tflint.BuiltinRuleSet{
-			Name:    "type-echo",
-			Version: "0.2.1",
+			Name:    "elements-of-style",
+			Version: "0.0.1",
 			Rules: []tflint.Rule{
 				rules.NewLengthRule(),
 				rules.NewShoutRule(),
