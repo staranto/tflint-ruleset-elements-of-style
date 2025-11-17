@@ -1,4 +1,4 @@
-# terraform_type_echo
+# eos_type_echo
 
 Disallow type echoing in block labels.
 
@@ -15,20 +15,20 @@ resource "aws_s3_bucket" "logging-bucket" {
 $ tflint
 1 issue(s) found:
 
-Warning: [Fixable] The type "aws_s3_bucket" is echoed in the label "logging-bucket" (type_echo)
+Warning: The type "aws_s3_bucket" is echoed in the label "logging-bucket" (type_echo)
 
   on config.tf line 1:
   1: resource "aws_s3_bucket" "logging-bucket" {
 
-Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.1.0/docs/rules/terraform_unused_declarations.md
+Reference: https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_type_echo.md
 
 ```
 
 ## Why
 
-Type echoing (aka. type jittering or [Hungarian Notation](https://en.wikipedia.org/wiki/Hungarian_notation)) is considered a bad practice when writing Terraform.  In *all* cases, the Terraform and OpenTofu tooling displays the type (`aws_s3_bucket`) immediately adjacent to the label, or name, (`logging-bucket`) of the occurence.
+Type echoing (aka. type jittering or, sometimes, [Hungarian Notation](https://en.wikipedia.org/wiki/Hungarian_notation)) is considered a bad practice when writing Terraform.  In *all* cases, the Terraform and OpenTofu tooling displays the type (`aws_s3_bucket`) immediately adjacent to the label, or name, (`logging-bucket`) of the occurence.
 
-In the HCL language itself, the syntax is -
+In the HCL language itself, the syntax is, for example -
 
 ```hcl
 resource "aws_s3_bucket" "logging-bucket" {
@@ -39,7 +39,7 @@ not -
 
 ```hcl
 resource "aws_s3_bucket"
-# A whle bunch of comments describing
+# A whole bunch of comments describing
 # what this resource is about
   "logging-bucket" {
   # ...
@@ -61,7 +61,7 @@ resource "aws_security_group" "primary_security_group" {
   # ...
 }
 
-resource "aws_vpc_security_group_ingress_rule" "sg_rule_ingress" {
+resource "aws_vpc_security_group_ingress_rule" "security_group_ingress_rule" {
   security_group_id = aws_security_group.primary_security_group.id
   # ...
 }
@@ -80,16 +80,13 @@ resource "aws_vpc_security_group_ingress_rule" "ingress" {
 }
 ```
 
-
 ## How To Fix
 
-Remove the declaration. For `variable` and `data`, remove the entire block. For a `local` value, remove the attribute from the `locals` block.
-
-While data sources should generally not have side effects, take greater care when removing them. For example, removing `data "http"` will cause Terraform to no longer perform an HTTP `GET` request during each plan. If a data source is being used for side effects, add an annotation to ignore it:
+Rename the resource block to remove the repetitive jitter. The rule can be ignored with -
 
 ```tf
-# tflint-ignore: terraform_unused_declarations
-data "http" "example" {
-  url = "https://checkpoint-api.hashicorp.com/v1/check/terraform"
+# tflint-ignore: eos_type_echo
+resource "aws_s3_bucket" "logging-bucket" {
+  # ...
 }
 ```

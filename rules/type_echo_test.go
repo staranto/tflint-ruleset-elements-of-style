@@ -26,7 +26,7 @@ func TestTypeEchoRule(t *testing.T) {
 			Expected: helper.Issues{
 				{
 					Rule:    NewTypeEchoRule(),
-					Message: `The type "aws_instance" is echoed  in the label "my_instance"`,
+					Message: `The type "aws_instance" is echoed in the label "my_instance"`,
 					Range: hcl.Range{
 						Filename: "main.tf",
 						Start:    hcl.Pos{Line: 1, Column: 1},
@@ -35,47 +35,47 @@ func TestTypeEchoRule(t *testing.T) {
 				},
 				{
 					Rule:    NewTypeEchoRule(),
-					Message: `The type "aws_instance" is echoed  in the label "MY_INSTANCE"`,
+					Message: `The type "aws_instance" is echoed in the label "MY_INSTANCE"`,
 					Range: hcl.Range{
 						Filename: "main.tf",
-						Start:    hcl.Pos{Line: 6, Column: 1},
-						End:      hcl.Pos{Line: 6, Column: 38},
+						Start:    hcl.Pos{Line: 7, Column: 1},
+						End:      hcl.Pos{Line: 7, Column: 38},
 					},
 				},
 				{
 					Rule:    NewTypeEchoRule(),
-					Message: `The type "aws_instance" is echoed  in the label "very_long_instance_name_that_exceeds_limit"`,
+					Message: `The type "aws_instance" is echoed in the label "very_long_instance_name_that_exceeds_limit"`,
 					Range: hcl.Range{
 						Filename: "main.tf",
-						Start:    hcl.Pos{Line: 11, Column: 1},
-						End:      hcl.Pos{Line: 11, Column: 69},
+						Start:    hcl.Pos{Line: 13, Column: 1},
+						End:      hcl.Pos{Line: 13, Column: 69},
 					},
 				},
 				{
 					Rule:    NewTypeEchoRule(),
-					Message: `The type "aws_s3_bucket" is echoed  in the label "my_bucket"`,
+					Message: `The type "aws_s3_bucket" is echoed in the label "my_bucket"`,
 					Range: hcl.Range{
 						Filename: "main.tf",
-						Start:    hcl.Pos{Line: 16, Column: 1},
-						End:      hcl.Pos{Line: 16, Column: 37},
+						Start:    hcl.Pos{Line: 19, Column: 1},
+						End:      hcl.Pos{Line: 19, Column: 37},
 					},
 				},
 				{
 					Rule:    NewTypeEchoRule(),
-					Message: `The type "check" is echoed  in the label "health_check"`,
+					Message: `The type "check" is echoed in the label "health_check"`,
 					Range: hcl.Range{
 						Filename: "main.tf",
-						Start:    hcl.Pos{Line: 60, Column: 1},
-						End:      hcl.Pos{Line: 60, Column: 21},
+						Start:    hcl.Pos{Line: 63, Column: 1},
+						End:      hcl.Pos{Line: 63, Column: 21},
 					},
 				},
 				{
 					Rule:    NewTypeEchoRule(),
-					Message: `The type "check" is echoed  in the label "HEALTH_CHECK"`,
+					Message: `The type "check" is echoed in the label "HEALTH_CHECK"`,
 					Range: hcl.Range{
 						Filename: "main.tf",
-						Start:    hcl.Pos{Line: 71, Column: 1},
-						End:      hcl.Pos{Line: 71, Column: 21},
+						Start:    hcl.Pos{Line: 74, Column: 1},
+						End:      hcl.Pos{Line: 74, Column: 21},
 					},
 				},
 			},

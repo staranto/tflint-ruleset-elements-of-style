@@ -3,16 +3,19 @@ resource "aws_instance" "my_instance" {
   instance_type = "t2.micro"
 }
 
+# tflint-ignore: eos_shout
 resource "aws_instance" "MY_INSTANCE" {
   ami           = "ami-12345678"
   instance_type = "t2.micro"
 }
 
+# tflint-ignore: eos_length
 resource "aws_instance" "very_long_instance_name_that_exceeds_limit" {
   ami           = "ami-12345678"
   instance_type = "t2.micro"
 }
 
+# tflint-ignore: eos_type_echo
 resource "aws_s3_bucket" "my_bucket" {
   bucket = "my-bucket"
 }

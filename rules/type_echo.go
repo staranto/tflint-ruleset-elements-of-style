@@ -5,6 +5,7 @@ package rules
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
@@ -22,96 +23,51 @@ type TypeEchoRule struct {
 func (r *TypeEchoRule) Check(runner tflint.Runner) error {
 
 	config := typeEchoRuleConfig{}
-
 	if err := runner.DecodeRuleConfig(r.Name(), &config); err != nil {
+		fmt.Fprintf(os.Stderr, "failed to decode rule config for %s: %v\n", r.Name(), err)
 		return err
 	}
-
 	r.Config = config
 
+	// myBlocks defines the block types and their label structures to check.
+	// The 'synonym' field
+	myBlocks := []BlockDef{
+		{Typ: "resource", Labels: []string{"type", "name"}, Synonym: ""},
+		{Typ: "data", Labels: []string{"type", "name"}, Synonym: ""},
+		{Typ: "check", Labels: []string{"name"}, Synonym: ""},
+		{Typ: "variable", Labels: []string{"name"}, Synonym: ""},
+	}
+
 	body, err := runner.GetModuleContent(&hclext.BodySchema{
-		Blocks: []hclext.BlockSchema{
-			{
-				Type:       "data",
-				LabelNames: []string{"type", "name"},
-				Body:       &hclext.BodySchema{},
-			},
-			{
-				Type:       "resource",
-				LabelNames: []string{"type", "name"},
-				Body:       &hclext.BodySchema{},
-			},
-			{
-				Type:       "check",
-				LabelNames: []string{"name"},
-				Body:       &hclext.BodySchema{},
-			},
-		},
+		Blocks: buildBlockSchemas(myBlocks),
 	}, nil)
 
 	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to get module content: %v\n", err)
 		return err
 	}
 
 	// Process data blocks
 	for _, block := range body.Blocks {
-		logger.Debug(fmt.Sprintf("#### block=%v", block))
-
-		var name string
-		var typ string
-
-		if block.Type == "check" {
-			typ = "check"
-			name = block.Labels[0]
-		} else {
-			typ = block.Labels[0]
-			name = block.Labels[1]
-		}
-
-		checkForEcho(runner, r, block, typ, name)
+		typ, name, synonym := normalizeBlock(block, myBlocks)
+		checkForEcho(runner, r, block, typ, name, synonym)
 	}
 
 	return nil
 }
 
-// Enabled returns whether the rule is enabled by default
-func (r *TypeEchoRule) Enabled() bool {
-	return true
-}
-
-// Link returns the rule reference link
-func (r *TypeEchoRule) Link() string {
-	return "https://www.example.com/type_echo"
-}
-
-// Name returns the rule name.
-func (r *TypeEchoRule) Name() string {
-	return "eos_type_echo"
-}
-
-// Severity returns the rule severity
-func (r *TypeEchoRule) Severity() tflint.Severity {
-	return tflint.WARNING
-}
-
-// NewTypeEchoRule returns a new rule.
-func NewTypeEchoRule() *TypeEchoRule {
-	return &TypeEchoRule{}
-}
-
-// typeEchoRuleConfig represents the configuration for the TypeEchoRule.
-type typeEchoRuleConfig struct {
-	Synonyms map[string][]string `hclext:"synonyms,optional"`
-}
-
 // checkForEcho checks if the type is echoed in the name.
-func checkForEcho(runner tflint.Runner, r *TypeEchoRule, block *hclext.Block, typ string, name string) {
+func checkForEcho(runner tflint.Runner,
+	r *TypeEchoRule, block *hclext.Block,
+	typ string, name string, synonym string) {
+
+	logger.Debug(fmt.Sprintf("checking for echo in type='%s' name='%s'", typ, name))
 	echo := false
-	synonymText := ""
 
 	lowerTyp := strings.ToLower(typ)   // aws_s3_bucket
 	lowerName := strings.ToLower(name) // my_bucket
 	splitName := strings.SplitSeq(lowerName, "_-")
+	synonymText := ""
 
 	for part := range strings.SplitSeq(lowerTyp, "_") {
 		logger.Debug(fmt.Sprintf("checking if '%s' contains part '%s'", lowerName, part))
@@ -120,16 +76,19 @@ func checkForEcho(runner tflint.Runner, r *TypeEchoRule, block *hclext.Block, ty
 			break
 		}
 
+		synonyms, _ := r.Config.Synonyms[part]
+		if synonym != "" {
+			synonyms = append(synonyms, synonym)
+		}
+
 		// Check synonyms
-		if synonyms, ok := r.Config.Synonyms[part]; ok {
-			for _, syn := range synonyms {
-				for n := range splitName {
-					logger.Debug(fmt.Sprintf("checking if synonym '%s' matches name part '%v'", syn, n))
-					if strings.Contains(n, syn) {
-						echo = true
-						synonymText = fmt.Sprintf(" (via synonym '%s')", syn)
-						break
-					}
+		for _, syn := range synonyms {
+			for n := range splitName {
+				logger.Debug(fmt.Sprintf("checking if synonym '%s' matches name part '%v'", syn, n))
+				if strings.Contains(n, syn) {
+					echo = true
+					synonymText = fmt.Sprintf(" (via synonym '%s')", syn)
+					break
 				}
 			}
 
@@ -145,8 +104,38 @@ func checkForEcho(runner tflint.Runner, r *TypeEchoRule, block *hclext.Block, ty
 		logger.Debug(fmt.Sprintf("emiting issue for type='%s' name='%s'", typ, name))
 		runner.EmitIssue(
 			r,
-			fmt.Sprintf("The type \"%s\" is echoed %s in the label \"%s\"", typ, synonymText, name),
+			fmt.Sprintf("The type \"%s\" is echoed%s in the label \"%s\"", typ, synonymText, name),
 			block.DefRange,
 		)
 	}
+}
+
+// Enabled returns whether the rule is enabled by default.
+func (r *TypeEchoRule) Enabled() bool {
+	return true
+}
+
+// Link returns the rule reference link.
+func (r *TypeEchoRule) Link() string {
+	return "https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_type_echo.md"
+}
+
+// Name returns the rule name.
+func (r *TypeEchoRule) Name() string {
+	return "eos_type_echo"
+}
+
+// Severity returns the rule severity.
+func (r *TypeEchoRule) Severity() tflint.Severity {
+	return tflint.WARNING
+}
+
+// NewTypeEchoRule returns a new rule.
+func NewTypeEchoRule() *TypeEchoRule {
+	return &TypeEchoRule{}
+}
+
+// typeEchoRuleConfig represents the configuration for the TypeEchoRule.
+type typeEchoRuleConfig struct {
+	Synonyms map[string][]string `hclext:"synonyms,optional"`
 }
