@@ -28,7 +28,13 @@ plugin "elements-of-style" {
 |eos_length|Disallow block labels longer than configurable length (default 16)|WARNING|✔|[Link](docs/rules/eos_length.md)|
 |eos_shout|Disallow all-uppercase block labels|WARNING|✔|[Link](docs/rules/eos_shout.md)|
 
-## Building the plugin
+## Installation
+
+1. Download the zip file for your platform from [Release](https://github.com/staranto/tflint-ruleset-elements-of-style/releases/latest).
+
+2. Unzip it to your `${HOME}/.tflint.d/plugins` folder
+
+## Building the plugin from source
 
 Clone the repository locally and run the following command:
 
@@ -41,6 +47,8 @@ You can easily install the built plugin with the following:
 ```
 $ make install
 ```
+
+### Configuring tflint
 
 You can run the built plugin like the following:
 
