@@ -29,8 +29,8 @@ func TestShoutRule(t *testing.T) {
 					Message: "'MY_INSTANCE' should not be all uppercase",
 					Range: hcl.Range{
 						Filename: "main.tf",
-						Start:    hcl.Pos{Line: 6, Column: 1},
-						End:      hcl.Pos{Line: 6, Column: 38},
+						Start:    hcl.Pos{Line: 7, Column: 1},
+						End:      hcl.Pos{Line: 7, Column: 38},
 					},
 				},
 				{
@@ -38,8 +38,8 @@ func TestShoutRule(t *testing.T) {
 					Message: "'UBUNTU' should not be all uppercase",
 					Range: hcl.Range{
 						Filename: "main.tf",
-						Start:    hcl.Pos{Line: 29, Column: 1},
-						End:      hcl.Pos{Line: 29, Column: 24},
+						Start:    hcl.Pos{Line: 32, Column: 1},
+						End:      hcl.Pos{Line: 32, Column: 24},
 					},
 				},
 				{
@@ -47,8 +47,8 @@ func TestShoutRule(t *testing.T) {
 					Message: "'INSTANCE_ID' should not be all uppercase",
 					Range: hcl.Range{
 						Filename: "main.tf",
-						Start:    hcl.Pos{Line: 44, Column: 1},
-						End:      hcl.Pos{Line: 44, Column: 21},
+						Start:    hcl.Pos{Line: 47, Column: 1},
+						End:      hcl.Pos{Line: 47, Column: 21},
 					},
 				},
 				{
@@ -56,8 +56,8 @@ func TestShoutRule(t *testing.T) {
 					Message: "'COMMON_TAGS' should not be all uppercase",
 					Range: hcl.Range{
 						Filename: "main.tf",
-						Start:    hcl.Pos{Line: 55, Column: 3},
-						End:      hcl.Pos{Line: 57, Column: 4},
+						Start:    hcl.Pos{Line: 58, Column: 3},
+						End:      hcl.Pos{Line: 60, Column: 4},
 					},
 				},
 				{
@@ -65,8 +65,8 @@ func TestShoutRule(t *testing.T) {
 					Message: "'HEALTH_CHECK' should not be all uppercase",
 					Range: hcl.Range{
 						Filename: "main.tf",
-						Start:    hcl.Pos{Line: 71, Column: 1},
-						End:      hcl.Pos{Line: 71, Column: 21},
+						Start:    hcl.Pos{Line: 74, Column: 1},
+						End:      hcl.Pos{Line: 74, Column: 21},
 					},
 				},
 			},
