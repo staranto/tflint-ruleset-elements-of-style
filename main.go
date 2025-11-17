@@ -13,7 +13,7 @@ func main() {
 	plugin.Serve(&plugin.ServeOpts{
 		RuleSet: &tflint.BuiltinRuleSet{
 			Name:    "elements-of-style",
-			Version: "0.0.1",
+			Version: "0.0.2",
 			Rules: []tflint.Rule{
 				rules.NewLengthRule(),
 				rules.NewShoutRule(),
