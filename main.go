@@ -4,17 +4,21 @@
 package main
 
 import (
+	"log"
+
 	"github.com/staranto/tflint-ruleset-elements-of-style/rules"
 	"github.com/terraform-linters/tflint-plugin-sdk/plugin"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
 func main() {
+	log.SetFlags(0)
 	plugin.Serve(&plugin.ServeOpts{
 		RuleSet: &tflint.BuiltinRuleSet{
 			Name:    "elements-of-style",
 			Version: "0.0.2",
 			Rules: []tflint.Rule{
+				rules.NewHungarianRule(),
 				rules.NewLengthRule(),
 				rules.NewShoutRule(),
 				rules.NewTypeEchoRule(),

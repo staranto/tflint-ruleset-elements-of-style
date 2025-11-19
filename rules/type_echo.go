@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
-	"github.com/terraform-linters/tflint-plugin-sdk/logger"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
@@ -29,31 +28,7 @@ func (r *TypeEchoRule) Check(runner tflint.Runner) error {
 	}
 	r.Config = config
 
-	// myBlocks defines the block types and their label structures to check.
-	// The 'synonym' field
-	myBlocks := []BlockDef{
-		{Typ: "resource", Labels: []string{"type", "name"}, Synonym: ""},
-		{Typ: "data", Labels: []string{"type", "name"}, Synonym: ""},
-		{Typ: "check", Labels: []string{"name"}, Synonym: ""},
-		{Typ: "variable", Labels: []string{"name"}, Synonym: ""},
-	}
-
-	body, err := runner.GetModuleContent(&hclext.BodySchema{
-		Blocks: buildBlockSchemas(myBlocks),
-	}, nil)
-
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to get module content: %v\n", err)
-		return err
-	}
-
-	// Process data blocks
-	for _, block := range body.Blocks {
-		typ, name, synonym := normalizeBlock(block, myBlocks)
-		checkForEcho(runner, r, block, typ, name, synonym)
-	}
-
-	return nil
+	return CheckBlocksAndLocals(runner, allLintableBlocks, r, checkForEcho)
 }
 
 // checkForEcho checks if the type is echoed in the name.
@@ -61,7 +36,7 @@ func checkForEcho(runner tflint.Runner,
 	r *TypeEchoRule, block *hclext.Block,
 	typ string, name string, synonym string) {
 
-	logger.Debug(fmt.Sprintf("checking for echo in type='%s' name='%s'", typ, name))
+	// logger.Debug(fmt.Sprintf("checking for echo in type='%s' name='%s'", typ, name))
 	echo := false
 
 	lowerTyp := strings.ToLower(typ)   // aws_s3_bucket
@@ -70,7 +45,7 @@ func checkForEcho(runner tflint.Runner,
 	synonymText := ""
 
 	for part := range strings.SplitSeq(lowerTyp, "_") {
-		logger.Debug(fmt.Sprintf("checking if '%s' contains part '%s'", lowerName, part))
+		// logger.Debug(fmt.Sprintf("checking if '%s' contains part '%s'", lowerName, part))
 		if strings.Contains(lowerName, part) {
 			echo = true
 			break
@@ -84,7 +59,7 @@ func checkForEcho(runner tflint.Runner,
 		// Check synonyms
 		for _, syn := range synonyms {
 			for n := range splitName {
-				logger.Debug(fmt.Sprintf("checking if synonym '%s' matches name part '%v'", syn, n))
+				// logger.Debug(fmt.Sprintf("checking if synonym '%s' matches name part '%v'", syn, n))
 				if strings.Contains(n, syn) {
 					echo = true
 					synonymText = fmt.Sprintf(" (via synonym '%s')", syn)
@@ -98,10 +73,10 @@ func checkForEcho(runner tflint.Runner,
 		}
 	}
 
-	logger.Debug(fmt.Sprintf("echo=%v for type='%s' name='%s'", echo, typ, name))
+	// logger.Debug(fmt.Sprintf("echo=%v for type='%s' name='%s'", echo, typ, name))
 
 	if echo {
-		logger.Debug(fmt.Sprintf("emiting issue for type='%s' name='%s'", typ, name))
+		// logger.Debug(fmt.Sprintf("emiting issue for type='%s' name='%s'", typ, name))
 		runner.EmitIssue(
 			r,
 			fmt.Sprintf("The type \"%s\" is echoed%s in the label \"%s\"", typ, synonymText, name),

@@ -7,48 +7,36 @@ import (
 	"fmt"
 
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
+	"github.com/terraform-linters/tflint-plugin-sdk/logger"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
-// LengthRule checks whether a block's type is shouted in its name.
+// defaultLength is the default maximum length for names.
+const defaultLength = 16
+
+// lengthRuleConfig represents the configuration for the LengthRule.
+type lengthRuleConfig struct {
+	Length int `hclext:"length,optional"`
+}
+
+// LengthRule checks whether a block's name is excessively long.
 type LengthRule struct {
 	tflint.DefaultRule
 	Config lengthRuleConfig
 }
 
 // Check checks whether the rule conditions are met.
-func (r *LengthRule) Check(runner tflint.Runner) error {
+func (rule *LengthRule) Check(runner tflint.Runner) error {
 
-	config := lengthRuleConfig{}
-	config.Length = 16
+	config := lengthRuleConfig{Length: defaultLength}
 
-	if err := runner.DecodeRuleConfig(r.Name(), &config); err != nil {
+	if err := runner.DecodeRuleConfig(rule.Name(), &config); err != nil {
 		return err
 	}
+	rule.Config = config
+	logger.Debug(fmt.Sprintf("rule.Config=%v", rule.Config))
 
-	r.Config = config
-
-	myBlocks := []BlockDef{
-		{Typ: "data", Labels: []string{"type", "name"}},
-		{Typ: "resource", Labels: []string{"type", "name"}},
-		{Typ: "check", Labels: []string{"name"}},
-	}
-
-	body, err := runner.GetModuleContent(&hclext.BodySchema{
-		Blocks: buildBlockSchemas(myBlocks),
-	}, nil)
-
-	if err != nil {
-		return err
-	}
-
-	// Process data blocks
-	for _, block := range body.Blocks {
-		typ, name, synonym := normalizeBlock(block, myBlocks)
-		checkForLength(runner, r, block, typ, name, synonym)
-	}
-
-	return nil
+	return CheckBlocksAndLocals(runner, allLintableBlocks, rule, checkForLength)
 }
 
 // checkForLength checks if the type is shouted in the name.
@@ -56,37 +44,33 @@ func checkForLength(runner tflint.Runner, r *LengthRule, block *hclext.Block, _ 
 	limit := r.Config.Length
 
 	if len(name) > limit {
-		runner.EmitIssue(r, fmt.Sprintf("'%s' is %d characters and should not be longer than %d", name, len(name), limit),
-			block.DefRange)
+		message := fmt.Sprintf("'%s' is %d characters and should not be longer than %d", name, len(name), limit)
+		runner.EmitIssue(r, message, block.DefRange)
+		logger.Debug(message)
 	}
 }
 
 // Enabled returns whether the rule is enabled by default
-func (r *LengthRule) Enabled() bool {
+func (rule *LengthRule) Enabled() bool {
 	return true
 }
 
 // Link returns the rule reference link
-func (r *LengthRule) Link() string {
+func (rule *LengthRule) Link() string {
 	return "https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_length.md"
 }
 
 // Name returns the rule name.
-func (r *LengthRule) Name() string {
+func (rule *LengthRule) Name() string {
 	return "eos_length"
 }
 
 // Severity returns the rule severity
-func (r *LengthRule) Severity() tflint.Severity {
+func (rule *LengthRule) Severity() tflint.Severity {
 	return tflint.WARNING
 }
 
 // NewLengthRule returns a new rule.
 func NewLengthRule() *LengthRule {
 	return &LengthRule{}
-}
-
-// lengthRuleConfig represents the configuration for the LengthRule.
-type lengthRuleConfig struct {
-	Length int `hclext:"length,optional"`
 }

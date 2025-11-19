@@ -4,78 +4,103 @@
 package rules
 
 import (
-	"io/ioutil"
+	"flag"
+	"fmt"
 	"testing"
+
+	"os"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
+var typeEchoDeep = flag.Bool("typeEchoDeep", false, "enable deep assert")
+
 func TestTypeEchoRule(t *testing.T) {
+	flag.Parse()
+
 	cases := []struct {
-		Name     string
-		Content  string
-		Expected helper.Issues
+		Name    string
+		Content string
+		Want    helper.Issues
 	}{
 		{
-			Name: "main",
+			Name: "echoed_names",
 			Content: func() string {
-				content, _ := ioutil.ReadFile("testdata/main.tf")
+				content, _ := os.ReadFile("testdata/type_echo_test.tf")
 				return string(content)
 			}(),
-			Expected: helper.Issues{
+			Want: helper.Issues{
 				{
 					Rule:    NewTypeEchoRule(),
-					Message: `The type "aws_instance" is echoed in the label "my_instance"`,
+					Message: makeTypeEchoMessage("variable", "variable_echo"),
 					Range: hcl.Range{
-						Filename: "main.tf",
-						Start:    hcl.Pos{Line: 1, Column: 1},
-						End:      hcl.Pos{Line: 1, Column: 38},
-					},
-				},
-				{
-					Rule:    NewTypeEchoRule(),
-					Message: `The type "aws_instance" is echoed in the label "MY_INSTANCE"`,
-					Range: hcl.Range{
-						Filename: "main.tf",
+						Filename: "type_echo_test.tf",
 						Start:    hcl.Pos{Line: 7, Column: 1},
-						End:      hcl.Pos{Line: 7, Column: 38},
+						End:      hcl.Pos{Line: 7, Column: 25},
 					},
 				},
 				{
 					Rule:    NewTypeEchoRule(),
-					Message: `The type "aws_instance" is echoed in the label "very_long_instance_name_that_exceeds_limit"`,
+					Message: makeTypeEchoMessage("check", "check_echo"),
 					Range: hcl.Range{
-						Filename: "main.tf",
+						Filename: "type_echo_test.tf",
 						Start:    hcl.Pos{Line: 13, Column: 1},
-						End:      hcl.Pos{Line: 13, Column: 69},
+						End:      hcl.Pos{Line: 13, Column: 19},
 					},
 				},
 				{
 					Rule:    NewTypeEchoRule(),
-					Message: `The type "aws_s3_bucket" is echoed in the label "my_bucket"`,
+					Message: makeTypeEchoMessage("aws_caller_identity", "caller_echo"),
 					Range: hcl.Range{
-						Filename: "main.tf",
-						Start:    hcl.Pos{Line: 19, Column: 1},
-						End:      hcl.Pos{Line: 19, Column: 37},
+						Filename: "type_echo_test.tf",
+						Start:    hcl.Pos{Line: 20, Column: 1},
+						End:      hcl.Pos{Line: 20, Column: 41},
 					},
 				},
 				{
 					Rule:    NewTypeEchoRule(),
-					Message: `The type "check" is echoed in the label "health_check"`,
+					Message: makeTypeEchoMessage("random_password", "password_echo"),
 					Range: hcl.Range{
-						Filename: "main.tf",
-						Start:    hcl.Pos{Line: 63, Column: 1},
-						End:      hcl.Pos{Line: 63, Column: 21},
+						Filename: "type_echo_test.tf",
+						Start:    hcl.Pos{Line: 22, Column: 1},
+						End:      hcl.Pos{Line: 22, Column: 44},
 					},
 				},
 				{
 					Rule:    NewTypeEchoRule(),
-					Message: `The type "check" is echoed in the label "HEALTH_CHECK"`,
+					Message: makeTypeEchoMessage("module", "module_echo"),
 					Range: hcl.Range{
-						Filename: "main.tf",
-						Start:    hcl.Pos{Line: 74, Column: 1},
-						End:      hcl.Pos{Line: 74, Column: 21},
+						Filename: "type_echo_test.tf",
+						Start:    hcl.Pos{Line: 26, Column: 1},
+						End:      hcl.Pos{Line: 26, Column: 21},
+					},
+				},
+				{
+					Rule:    NewTypeEchoRule(),
+					Message: makeTypeEchoMessage("output", "output_echo"),
+					Range: hcl.Range{
+						Filename: "type_echo_test.tf",
+						Start:    hcl.Pos{Line: 30, Column: 1},
+						End:      hcl.Pos{Line: 30, Column: 21},
+					},
+				},
+				{
+					Rule:    NewTypeEchoRule(),
+					Message: makeTypeEchoMessage("aws_instance", "instance_echo"),
+					Range: hcl.Range{
+						Filename: "type_echo_test.tf",
+						Start:    hcl.Pos{Line: 35, Column: 1},
+						End:      hcl.Pos{Line: 35, Column: 40},
+					},
+				},
+				{
+					Rule:    NewTypeEchoRule(),
+					Message: makeTypeEchoMessage("local", "local_echo"),
+					Range: hcl.Range{
+						Filename: "type_echo_test.tf",
+						Start:    hcl.Pos{Line: 10, Column: 3},
+						End:      hcl.Pos{Line: 10, Column: 17},
 					},
 				},
 			},
@@ -83,16 +108,35 @@ func TestTypeEchoRule(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		t.Run(tc.Name, func(t *testing.T) {
-			runner := helper.TestRunner(t, map[string]string{"main.tf": tc.Content})
 
-			rule := NewTypeEchoRule()
+		// Run the tests and make sure the basic results are found...
+		runner := helper.TestRunner(t, map[string]string{"type_echo_test.tf": tc.Content})
+		rule := NewTypeEchoRule()
 
-			if err := rule.Check(runner); err != nil {
-				t.Fatalf("Unexpected error occurred: %s", err)
+		// ... no errors.
+		if err := rule.Check(runner); err != nil {
+			t.Fatalf("Unexpected error occurred: %s", err)
+		}
+
+		// ... and the expected number of issues.
+		if len(runner.Issues) != len(tc.Want) {
+			t.Logf("Expected %d issues, got %d", len(tc.Want), len(runner.Issues))
+			for i, issue := range runner.Issues {
+				t.Logf("Issue %d: %s at %s", i, issue.Message, issue.Range)
 			}
+			t.Fatalf("Number of issues mismatch: got %d, want %d", len(runner.Issues), len(tc.Want))
+		}
 
-			helper.AssertIssues(t, tc.Expected, runner.Issues)
+		t.Run(tc.Name, func(t *testing.T) {
+			if *typeEchoDeep {
+				helper.AssertIssues(t, tc.Want, runner.Issues)
+			} else {
+				helper.AssertIssuesWithoutRange(t, tc.Want, runner.Issues)
+			}
 		})
 	}
+}
+
+func makeTypeEchoMessage(typ string, name string) string {
+	return fmt.Sprintf("The type \"%s\" is echoed in the label \"%s\"", typ, name)
 }

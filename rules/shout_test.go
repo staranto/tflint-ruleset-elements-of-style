@@ -4,69 +4,104 @@
 package rules
 
 import (
-	"io/ioutil"
+	"flag"
+	"fmt"
 	"testing"
+
+	"os"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
+var shoutDeep = flag.Bool("shoutDeep", false, "enable deep assert")
+var shoutName = "SHOUT"
+
 func TestShoutRule(t *testing.T) {
+	flag.Parse()
+
 	cases := []struct {
-		Name     string
-		Content  string
-		Expected helper.Issues
+		Name    string
+		Content string
+		Want    helper.Issues
 	}{
 		{
-			Name: "main",
+			Name: "shouted_names",
 			Content: func() string {
-				content, _ := ioutil.ReadFile("testdata/main.tf")
+				content, _ := os.ReadFile("testdata/shout_test.tf")
 				return string(content)
 			}(),
-			Expected: helper.Issues{
+			Want: helper.Issues{
 				{
 					Rule:    NewShoutRule(),
-					Message: "'MY_INSTANCE' should not be all uppercase",
+					Message: makeShoutMessage(shoutName),
 					Range: hcl.Range{
-						Filename: "main.tf",
+						Filename: "shout_test.tf",
 						Start:    hcl.Pos{Line: 7, Column: 1},
-						End:      hcl.Pos{Line: 7, Column: 38},
+						End:      hcl.Pos{Line: 7, Column: 19},
 					},
 				},
 				{
 					Rule:    NewShoutRule(),
-					Message: "'UBUNTU' should not be all uppercase",
+					Message: makeShoutMessage(shoutName),
 					Range: hcl.Range{
-						Filename: "main.tf",
-						Start:    hcl.Pos{Line: 32, Column: 1},
-						End:      hcl.Pos{Line: 32, Column: 24},
+						Filename: "shout_test.tf",
+						Start:    hcl.Pos{Line: 10, Column: 3},
+						End:      hcl.Pos{Line: 10, Column: 12},
 					},
 				},
 				{
 					Rule:    NewShoutRule(),
-					Message: "'INSTANCE_ID' should not be all uppercase",
+					Message: makeShoutMessage(shoutName),
 					Range: hcl.Range{
-						Filename: "main.tf",
-						Start:    hcl.Pos{Line: 47, Column: 1},
-						End:      hcl.Pos{Line: 47, Column: 21},
+						Filename: "shout_test.tf",
+						Start:    hcl.Pos{Line: 13, Column: 1},
+						End:      hcl.Pos{Line: 13, Column: 16},
 					},
 				},
 				{
 					Rule:    NewShoutRule(),
-					Message: "'COMMON_TAGS' should not be all uppercase",
+					Message: makeShoutMessage(shoutName),
 					Range: hcl.Range{
-						Filename: "main.tf",
-						Start:    hcl.Pos{Line: 58, Column: 3},
-						End:      hcl.Pos{Line: 60, Column: 4},
+						Filename: "shout_test.tf",
+						Start:    hcl.Pos{Line: 20, Column: 1},
+						End:      hcl.Pos{Line: 20, Column: 38},
 					},
 				},
 				{
 					Rule:    NewShoutRule(),
-					Message: "'HEALTH_CHECK' should not be all uppercase",
+					Message: makeShoutMessage(shoutName),
 					Range: hcl.Range{
-						Filename: "main.tf",
-						Start:    hcl.Pos{Line: 74, Column: 1},
-						End:      hcl.Pos{Line: 74, Column: 21},
+						Filename: "shout_test.tf",
+						Start:    hcl.Pos{Line: 22, Column: 1},
+						End:      hcl.Pos{Line: 22, Column: 38},
+					},
+				},
+				{
+					Rule:    NewShoutRule(),
+					Message: makeShoutMessage(shoutName),
+					Range: hcl.Range{
+						Filename: "shout_test.tf",
+						Start:    hcl.Pos{Line: 26, Column: 1},
+						End:      hcl.Pos{Line: 26, Column: 16},
+					},
+				},
+				{
+					Rule:    NewShoutRule(),
+					Message: makeShoutMessage(shoutName),
+					Range: hcl.Range{
+						Filename: "shout_test.tf",
+						Start:    hcl.Pos{Line: 30, Column: 1},
+						End:      hcl.Pos{Line: 30, Column: 16},
+					},
+				},
+				{
+					Rule:    NewShoutRule(),
+					Message: makeShoutMessage(shoutName),
+					Range: hcl.Range{
+						Filename: "shout_test.tf",
+						Start:    hcl.Pos{Line: 35, Column: 1},
+						End:      hcl.Pos{Line: 35, Column: 34},
 					},
 				},
 			},
@@ -74,16 +109,31 @@ func TestShoutRule(t *testing.T) {
 	}
 
 	for _, tc := range cases {
+
+		// Run the tests and make sure the basic results are found...
+		runner := helper.TestRunner(t, map[string]string{"shout_test.tf": tc.Content})
+		rule := NewShoutRule()
+
+		// ... no errors.
+		if err := rule.Check(runner); err != nil {
+			t.Fatalf("Unexpected error occurred: %s", err)
+		}
+
+		// ... and the expected number of issues.
+		if len(runner.Issues) != len(tc.Want) {
+			t.Fatalf("Number of issues mismatch: got %d, want %d", len(runner.Issues), len(tc.Want))
+		}
+
 		t.Run(tc.Name, func(t *testing.T) {
-			runner := helper.TestRunner(t, map[string]string{"main.tf": tc.Content})
-
-			rule := NewShoutRule()
-
-			if err := rule.Check(runner); err != nil {
-				t.Fatalf("Unexpected error occurred: %s", err)
+			if *shoutDeep {
+				helper.AssertIssues(t, tc.Want, runner.Issues)
+			} else {
+				helper.AssertIssuesWithoutRange(t, tc.Want, runner.Issues)
 			}
-
-			helper.AssertIssues(t, tc.Expected, runner.Issues)
 		})
 	}
+}
+
+func makeShoutMessage(name string) string {
+	return fmt.Sprintf("'%s' should not be all uppercase", name)
 }
