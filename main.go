@@ -20,6 +20,7 @@ func main() {
 			Rules: []tflint.Rule{
 				rules.NewHungarianRule(),
 				rules.NewLengthRule(),
+				rules.NewReminderRule(),
 				rules.NewShoutRule(),
 				rules.NewTypeEchoRule(),
 			},
