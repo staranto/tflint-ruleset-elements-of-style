@@ -4,23 +4,96 @@
 package rules
 
 import (
-	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
+	"fmt"
+	"os"
+	"strings"
+
+	"github.com/hashicorp/hcl/v2"
+	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/terraform-linters/tflint-plugin-sdk/logger"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
+
+var defaultReminderTags = []string{
+	"BUG",
+	"FIXME",
+	"HACK",
+	"TODO",
+}
+
+// reminderRuleConfig represents the configuration for the ReminderRule.
+type reminderRuleConfig struct {
+	Tags []string `hclext:"tags,optional"`
+}
 
 // ReminderRule checks for reminders.
 type ReminderRule struct {
 	tflint.DefaultRule
+	Config reminderRuleConfig
 }
 
 // Check checks whether the rule conditions are met.
 func (r *ReminderRule) Check(runner tflint.Runner) error {
-	return CheckBlocksAndLocals(runner, allLintableBlocks, r, checkReminder)
+
+	config := reminderRuleConfig{}
+	if err := runner.DecodeRuleConfig(r.Name(), &config); err != nil {
+		fmt.Fprintf(os.Stderr, "failed to decode rule config for %s: %v\n", r.Name(), err)
+		return err
+	}
+	r.Config = config
+
+	path, err := runner.GetModulePath()
+	if err != nil {
+		return err
+	}
+	if !path.IsRoot() {
+		// This rule does not evaluate child modules.
+		return nil
+	}
+
+	files, err := runner.GetFiles()
+	if err != nil {
+		return err
+	}
+	for name, file := range files {
+		if err := r.checkReminders(runner, name, file); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
-// checkReminder checks for reminders.
-func checkReminder(runner tflint.Runner, r *ReminderRule, block *hclext.Block, typ string, name string, synonym string) {
-	// return null for now
+func (r *ReminderRule) checkReminders(runner tflint.Runner, filename string, file *hcl.File) error {
+
+	tags := append(defaultReminderTags, r.Config.Tags...)
+
+	tokens, diags := hclsyntax.LexConfig(file.Bytes, filename, hcl.InitialPos)
+	if diags.HasErrors() {
+		return diags
+	}
+
+	for _, token := range tokens {
+		if token.Type != hclsyntax.TokenComment {
+			continue
+		}
+
+		text := string(token.Bytes)
+		tokens := strings.SplitAfterN(strings.ToUpper(text), " ", 2)
+		if len(tokens) < 2 {
+			continue
+		}
+
+		for _, t := range tags {
+			if strings.HasSuffix(strings.TrimSpace(tokens[0]), t) || strings.HasPrefix(tokens[1], t) {
+				message := fmt.Sprintf("'%s' has a reminder tag.", strings.TrimSpace(text))
+				runner.EmitIssue(r, message, token.Range)
+				logger.Debug(message)
+			}
+		}
+	}
+
+	return nil
 }
 
 // Enabled returns whether the rule is enabled by default.
