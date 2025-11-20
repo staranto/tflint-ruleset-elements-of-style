@@ -5,7 +5,7 @@ default: build
 test:
 	go test ./...
 
-build: test
+build:
 	go build
 
 install: build
@@ -20,8 +20,8 @@ release:
 		exit 1; \
 	fi
 	sed -i 's/version = "[0-9]\+\.[0-9]\+\.[0-9]\+"/version = "$(VERSION)"/' README.md
- 	git add README.md
- 	git commit -m "chore: bump version to $(VERSION)"
- 	git tag v$(VERSION)
+	git add README.md
+	git commit --message "chore: bump version to $(VERSION)"
+	git tag v$(VERSION)
 	@echo "Successfully bumped to $(VERSION) and created tag v$(VERSION)."
 	@echo "Run 'git push origin main --tags' to publish."
