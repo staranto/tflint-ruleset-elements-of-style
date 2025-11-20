@@ -19,9 +19,10 @@ release:
 		echo "Error: VERSION must be a valid semantic version (e.g. 0.2.0) without leading 'v'. Got: $(VERSION)"; \
 		exit 1; \
 	fi
-	sed -i 's/version = "[0-9]\+\.[0-9]\+\.[0-9]\+"/version = "$(VERSION)"/' README.md
-	git add README.md
-	git commit --message "chore: bump version to $(VERSION)"
+
+	sed -i 's/\(version = \|Version: \)"[0-9]\+\.[0-9]\+\.[0-9]\+"/\1"$(VERSION)"/' README.md main.go
+	git add README.md main.go
+	git commit --message "Release version $(VERSION)"
 	git tag v$(VERSION)
 	@echo "Successfully bumped to $(VERSION) and created tag v$(VERSION)."
 	@echo "Run 'git push origin main --tags' to publish."
