@@ -135,5 +135,5 @@ func TestLengthRule(t *testing.T) {
 }
 
 func makeLengthMessage(name string) string {
-	return fmt.Sprintf("'%s' is %d characters and should not be longer than %d", name, len(name), 16)
+	return fmt.Sprintf("'%s' is %d characters and should not be longer than %d.", name, len(name), 16)
 }

@@ -31,7 +31,7 @@ output "num_hung" {
   value = local.hung_int
 }
 
-// tflint-ignore: eos_hungarian
+# tflint-ignore: eos_hungarian
 resource "aws_instance" "str_hung" {
   ami = "ami-12345678"
 }

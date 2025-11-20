@@ -31,7 +31,7 @@ output "output_echo" {
   value = local.local_echo
 }
 
-// tflint-ignore: eos_type_echo
+# tflint-ignore: eos_type_echo
 resource "aws_instance" "instance_echo" {
   ami = "ami-12345678"
 }

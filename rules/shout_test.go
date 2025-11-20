@@ -135,5 +135,5 @@ func TestShoutRule(t *testing.T) {
 }
 
 func makeShoutMessage(name string) string {
-	return fmt.Sprintf("'%s' should not be all uppercase", name)
+	return fmt.Sprintf("'%s' should not be all uppercase.", name)
 }

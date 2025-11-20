@@ -31,7 +31,7 @@ output "SHOUT" {
   value = local.SHOUT
 }
 
-// tflint-ignore: eos_shout
+# tflint-ignore: eos_shout
 resource "aws_instance" "SHOUT" {
   ami = "ami-12345678"
 }

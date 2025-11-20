@@ -134,5 +134,5 @@ func TestHungarianRule(t *testing.T) {
 }
 
 func makeHungarianMessage(name string, key string) string {
-	return fmt.Sprintf("'%s' uses Hungarian notation with '%s'", name, key)
+	return fmt.Sprintf("'%s' uses Hungarian notation with '%s'.", name, key)
 }

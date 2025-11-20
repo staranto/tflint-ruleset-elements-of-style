@@ -44,7 +44,7 @@ func checkForLength(runner tflint.Runner, r *LengthRule, block *hclext.Block, _ 
 	limit := r.Config.Length
 
 	if len(name) > limit {
-		message := fmt.Sprintf("'%s' is %d characters and should not be longer than %d", name, len(name), limit)
+		message := fmt.Sprintf("'%s' is %d characters and should not be longer than %d.", name, len(name), limit)
 		runner.EmitIssue(r, message, block.DefRange)
 		logger.Debug(message)
 	}

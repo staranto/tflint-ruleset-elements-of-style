@@ -138,5 +138,5 @@ func TestTypeEchoRule(t *testing.T) {
 }
 
 func makeTypeEchoMessage(typ string, name string) string {
-	return fmt.Sprintf("The type \"%s\" is echoed in the label \"%s\"", typ, name)
+	return fmt.Sprintf("The type \"%s\" is echoed in the label \"%s\".", typ, name)
 }

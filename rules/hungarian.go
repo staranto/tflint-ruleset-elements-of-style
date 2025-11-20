@@ -12,10 +12,16 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
+var defaultHungarianTags = []string{
+	"str",
+	"int", "num",
+	"bool",
+	"list", "lst", "set", "map", "arr", "array",
+}
+
 // hungarianRuleConfig represents the configuration for the HungarianRule.
 type hungarianRuleConfig struct {
-	Defaults []string `hclext:"defaults,optional"`
-	More     []string `hclext:"more,optional"`
+	Tags []string `hclext:"tags,optional"`
 }
 
 // HungarianRule checks whether a block's type is echoed in its name.
@@ -39,20 +45,12 @@ func (r *HungarianRule) Check(runner tflint.Runner) error {
 
 // checkForHungarian checks if the name uses Hungarian notation.
 func checkForHungarian(runner tflint.Runner, r *HungarianRule, block *hclext.Block, typ string, name string, _ string) {
-	keys := r.Config.Defaults
-	if len(keys) == 0 {
-		keys = []string{
-			"str",
-			"int", "num",
-			"bool",
-			"list", "lst", "set", "map", "arr"} // default
-	}
 
-	keys = append(keys, r.Config.More...)
+	tags := append(defaultHungarianTags, r.Config.Tags...)
 
-	for _, k := range keys {
-		if strings.HasPrefix(name, k) || strings.HasSuffix(name, k) || strings.Contains(name, "_"+k) {
-			runner.EmitIssue(r, fmt.Sprintf("'%s' uses Hungarian notation with '%s'", name, k),
+	for _, t := range tags {
+		if strings.HasPrefix(name, t) || strings.HasSuffix(name, t) || strings.Contains(name, "_"+t) {
+			runner.EmitIssue(r, fmt.Sprintf("'%s' uses Hungarian notation with '%s'.", name, t),
 				block.DefRange)
 			return
 		}

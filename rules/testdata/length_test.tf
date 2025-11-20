@@ -31,7 +31,7 @@ output "zakpxy_very_long_name" {
   value = local.zakpxy_very_long_name
 }
 
-// tflint-ignore: eos_length
+# tflint-ignore: eos_length
 resource "aws_instance" "zakpxy_very_long_name" {
   ami = "ami-12345678"
 }

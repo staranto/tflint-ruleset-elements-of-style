@@ -43,7 +43,7 @@ func checkForShout(runner tflint.Runner, r *ShoutRule, block *hclext.Block, _ st
 	}
 
 	if hasAlpha && allUpper {
-		message := fmt.Sprintf("'%s' should not be all uppercase", name)
+		message := fmt.Sprintf("'%s' should not be all uppercase.", name)
 		runner.EmitIssue(r, message, block.DefRange)
 		logger.Debug(message)
 	}

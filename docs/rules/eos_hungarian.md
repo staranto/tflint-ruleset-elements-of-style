@@ -31,7 +31,7 @@ Hungarian notation (encoding type information in variable names) is generally co
 
 The list of disallowed prefixes/suffixes can be customized.
 
-By default, the following strings are checked: `str`, `int`, `num`, `bool`, `list`, `lst`, `set`, `map`, `arr`.
+By default, the following strings are checked: `str`, `int`, `num`, `bool`, `list`, `lst`, `set`, `map`, `arr`, `array`.
 
 You can override the defaults completely:
 

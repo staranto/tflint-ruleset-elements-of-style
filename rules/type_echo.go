@@ -79,7 +79,7 @@ func checkForEcho(runner tflint.Runner,
 		// logger.Debug(fmt.Sprintf("emiting issue for type='%s' name='%s'", typ, name))
 		runner.EmitIssue(
 			r,
-			fmt.Sprintf("The type \"%s\" is echoed%s in the label \"%s\"", typ, synonymText, name),
+			fmt.Sprintf("The type \"%s\" is echoed%s in the label \"%s\".", typ, synonymText, name),
 			block.DefRange,
 		)
 	}
