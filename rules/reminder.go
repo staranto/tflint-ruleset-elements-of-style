@@ -34,13 +34,10 @@ type ReminderRule struct {
 
 // Check checks whether the rule conditions are met.
 func (r *ReminderRule) Check(runner tflint.Runner) error {
-
-	config := reminderRuleConfig{}
-	if err := runner.DecodeRuleConfig(r.Name(), &config); err != nil {
+	if err := runner.DecodeRuleConfig(r.Name(), &r.Config); err != nil {
 		fmt.Fprintf(os.Stderr, "failed to decode rule config for %s: %v\n", r.Name(), err)
 		return err
 	}
-	r.Config = config
 
 	path, err := runner.GetModulePath()
 	if err != nil {
@@ -65,8 +62,7 @@ func (r *ReminderRule) Check(runner tflint.Runner) error {
 }
 
 func (r *ReminderRule) checkReminders(runner tflint.Runner, filename string, file *hcl.File) error {
-
-	tags := append(defaultReminderTags, r.Config.Tags...)
+	tags := r.Config.Tags
 
 	tokens, diags := hclsyntax.LexConfig(file.Bytes, filename, hcl.InitialPos)
 	if diags.HasErrors() {
@@ -96,6 +92,13 @@ func (r *ReminderRule) checkReminders(runner tflint.Runner, filename string, fil
 	return nil
 }
 
+// NewReminderRule returns a new rule.
+func NewReminderRule() *ReminderRule {
+	rule := &ReminderRule{}
+	rule.Config.Tags = defaultReminderTags
+	return rule
+}
+
 // Enabled returns whether the rule is enabled by default.
 func (r *ReminderRule) Enabled() bool {
 	return true
@@ -114,9 +117,4 @@ func (r *ReminderRule) Name() string {
 // Severity returns the rule severity.
 func (r *ReminderRule) Severity() tflint.Severity {
 	return tflint.WARNING
-}
-
-// NewReminderRule returns a new rule.
-func NewReminderRule() *ReminderRule {
-	return &ReminderRule{}
 }

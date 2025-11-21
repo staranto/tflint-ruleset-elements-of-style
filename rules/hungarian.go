@@ -32,21 +32,17 @@ type HungarianRule struct {
 
 // Check checks whether the rule conditions are met.
 func (r *HungarianRule) Check(runner tflint.Runner) error {
-
-	config := hungarianRuleConfig{}
-	if err := runner.DecodeRuleConfig(r.Name(), &config); err != nil {
+	if err := runner.DecodeRuleConfig(r.Name(), &r.Config); err != nil {
 		fmt.Fprintf(os.Stderr, "failed to decode rule config for %s: %v\n", r.Name(), err)
 		return err
 	}
-	r.Config = config
 
 	return CheckBlocksAndLocals(runner, allLintableBlocks, r, checkForHungarian)
 }
 
 // checkForHungarian checks if the name uses Hungarian notation.
 func checkForHungarian(runner tflint.Runner, r *HungarianRule, block *hclext.Block, typ string, name string, _ string) {
-
-	tags := append(defaultHungarianTags, r.Config.Tags...)
+	tags := r.Config.Tags
 
 	for _, t := range tags {
 		if strings.HasPrefix(name, t) || strings.HasSuffix(name, t) || strings.Contains(name, "_"+t) {
@@ -55,6 +51,13 @@ func checkForHungarian(runner tflint.Runner, r *HungarianRule, block *hclext.Blo
 			return
 		}
 	}
+}
+
+// NewHungarianRule returns a new rule.
+func NewHungarianRule() *HungarianRule {
+	rule := &HungarianRule{}
+	rule.Config.Tags = defaultHungarianTags
+	return rule
 }
 
 // Enabled returns whether the rule is enabled by default.
@@ -75,9 +78,4 @@ func (r *HungarianRule) Name() string {
 // Severity returns the rule severity.
 func (r *HungarianRule) Severity() tflint.Severity {
 	return tflint.WARNING
-}
-
-// NewHungarianRule returns a new rule.
-func NewHungarianRule() *HungarianRule {
-	return &HungarianRule{}
 }

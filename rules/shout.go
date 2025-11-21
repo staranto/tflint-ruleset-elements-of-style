@@ -49,6 +49,11 @@ func checkForShout(runner tflint.Runner, r *ShoutRule, block *hclext.Block, _ st
 	}
 }
 
+// NewShoutRule returns a new rule.
+func NewShoutRule() *ShoutRule {
+	return &ShoutRule{}
+}
+
 // Enabled returns whether the rule is enabled by default
 func (r *ShoutRule) Enabled() bool {
 	return true
@@ -67,9 +72,4 @@ func (r *ShoutRule) Name() string {
 // Severity returns the rule severity
 func (r *ShoutRule) Severity() tflint.Severity {
 	return tflint.WARNING
-}
-
-// NewShoutRule returns a new rule.
-func NewShoutRule() *ShoutRule {
-	return &ShoutRule{}
 }

@@ -27,13 +27,9 @@ type LengthRule struct {
 
 // Check checks whether the rule conditions are met.
 func (rule *LengthRule) Check(runner tflint.Runner) error {
-
-	config := lengthRuleConfig{Length: defaultLength}
-
-	if err := runner.DecodeRuleConfig(rule.Name(), &config); err != nil {
+	if err := runner.DecodeRuleConfig(rule.Name(), &rule.Config); err != nil {
 		return err
 	}
-	rule.Config = config
 	logger.Debug(fmt.Sprintf("rule.Config=%v", rule.Config))
 
 	return CheckBlocksAndLocals(runner, allLintableBlocks, rule, checkForLength)
@@ -48,6 +44,13 @@ func checkForLength(runner tflint.Runner, r *LengthRule, block *hclext.Block, _ 
 		runner.EmitIssue(r, message, block.DefRange)
 		logger.Debug(message)
 	}
+}
+
+// NewLengthRule returns a new rule.
+func NewLengthRule() *LengthRule {
+	rule := &LengthRule{}
+	rule.Config.Length = defaultLength
+	return rule
 }
 
 // Enabled returns whether the rule is enabled by default
@@ -68,9 +71,4 @@ func (rule *LengthRule) Name() string {
 // Severity returns the rule severity
 func (rule *LengthRule) Severity() tflint.Severity {
 	return tflint.WARNING
-}
-
-// NewLengthRule returns a new rule.
-func NewLengthRule() *LengthRule {
-	return &LengthRule{}
 }

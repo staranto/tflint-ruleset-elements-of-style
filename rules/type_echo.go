@@ -12,6 +12,11 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
+// typeEchoRuleConfig represents the configuration for the TypeEchoRule.
+type typeEchoRuleConfig struct {
+	Synonyms map[string][]string `hclext:"synonyms,optional"`
+}
+
 // TypeEchoRule checks whether a block's type is echoed in its name.
 type TypeEchoRule struct {
 	tflint.DefaultRule
@@ -20,13 +25,10 @@ type TypeEchoRule struct {
 
 // Check checks whether the rule conditions are met.
 func (r *TypeEchoRule) Check(runner tflint.Runner) error {
-
-	config := typeEchoRuleConfig{}
-	if err := runner.DecodeRuleConfig(r.Name(), &config); err != nil {
+	if err := runner.DecodeRuleConfig(r.Name(), &r.Config); err != nil {
 		fmt.Fprintf(os.Stderr, "failed to decode rule config for %s: %v\n", r.Name(), err)
 		return err
 	}
-	r.Config = config
 
 	return CheckBlocksAndLocals(runner, allLintableBlocks, r, checkForEcho)
 }
@@ -85,6 +87,11 @@ func checkForEcho(runner tflint.Runner,
 	}
 }
 
+// NewTypeEchoRule returns a new rule.
+func NewTypeEchoRule() *TypeEchoRule {
+	return &TypeEchoRule{}
+}
+
 // Enabled returns whether the rule is enabled by default.
 func (r *TypeEchoRule) Enabled() bool {
 	return true
@@ -103,14 +110,4 @@ func (r *TypeEchoRule) Name() string {
 // Severity returns the rule severity.
 func (r *TypeEchoRule) Severity() tflint.Severity {
 	return tflint.WARNING
-}
-
-// NewTypeEchoRule returns a new rule.
-func NewTypeEchoRule() *TypeEchoRule {
-	return &TypeEchoRule{}
-}
-
-// typeEchoRuleConfig represents the configuration for the TypeEchoRule.
-type typeEchoRuleConfig struct {
-	Synonyms map[string][]string `hclext:"synonyms,optional"`
 }

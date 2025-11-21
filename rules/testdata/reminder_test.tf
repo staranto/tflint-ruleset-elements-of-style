@@ -14,6 +14,11 @@ locals {
 resource "terraform_data" "fixme" { # FIXME Reminder found.
 }
 
+/*
+  FIXME
+  Reminder found.
+*/
+
 # #########
 # Tests that will not emit issues.
 
