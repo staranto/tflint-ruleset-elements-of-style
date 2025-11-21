@@ -44,7 +44,7 @@ jobs:
       - name: Run goreleaser
         uses: goreleaser/goreleaser-action@v2
         with:
-          args: release --rm-dist
+          args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Tell cosign where Rekor is (default is https://rekor.sigstore.dev)
