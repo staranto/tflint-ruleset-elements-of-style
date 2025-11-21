@@ -49,7 +49,7 @@ The plugin can be enabled with `tflint --init` after declaring the plugin in `.t
 plugin "elements-of-style" {
   enabled = true
 
-  version = "0.3.5"
+  version = "0.3.6"
   source  = "github.com/staranto/tflint-ruleset-elements-of-style"
 }
 ```
