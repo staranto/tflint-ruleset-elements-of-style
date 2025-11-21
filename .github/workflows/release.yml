@@ -41,6 +41,9 @@ jobs:
           echo "Rekor URL: https://rekor.sigstore.dev"
           curl -fsS https://rekor.sigstore.dev/api/v1/log -o /dev/null || echo "rekor reachable check (non-fatal)"
 
+      - name: Ensure dist directory exists and is writable
+        run: mkdir -p dist && chmod -R 0777 dist
+
       - name: Run goreleaser
         uses: goreleaser/goreleaser-action@v2
         with:
