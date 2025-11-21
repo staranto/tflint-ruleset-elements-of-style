@@ -27,18 +27,16 @@ checksum:
   name_template: "checksums.txt"
   extra_files:
     - glob: ./dist/raw/*
+
 signs:
-  - cmd: cosign
-    signature: "${artifact}.keyless.sig"
-    certificate: "${artifact}.pem"
-    output: true
-    artifacts: checksum
-    args:
-      - sign-blob
-      - "--output-certificate=${certificate}"
-      - "--output-signature=${signature}"
-      - "${artifact}"
-      - --yes
+  artifacts: checksum
+  cmd: cosign
+  args:
+    - sign-blob
+    - --use-signing-config
+    - --bundle
+    - dist/checksums.txt.bundle
+
 release:
   github:
   draft: true
