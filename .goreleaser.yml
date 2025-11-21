@@ -29,13 +29,13 @@ checksum:
     - glob: ./dist/raw/*
 
 signs:
-  artifacts: checksum
-  cmd: cosign
-  args:
-    - sign-blob
-    - --use-signing-config
-    - --bundle
-    - dist/checksums.txt.bundle
+  - artifacts: checksum
+    cmd: cosign
+    args:
+      - sign-blob
+      - --use-signing-config
+      - --bundle
+      - dist/checksums.txt.bundle
 
 release:
   github:
