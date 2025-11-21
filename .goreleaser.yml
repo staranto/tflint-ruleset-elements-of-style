@@ -20,16 +20,27 @@ builds:
 archives:
   - id: zip
     name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
-    formats:
-      - zip
+    format: zip
     files:
       - none*
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
   extra_files:
     - glob: ./dist/raw/*
 signs:
-  - artifacts: checksum
-    args: ["--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}"]
+  - cmd: cosign
+    signature: "${artifact}.keyless.sig"
+    certificate: "${artifact}.pem"
+    output: true
+    artifacts: checksum
+    args:
+      - sign-blob
+      - "--output-certificate=${certificate}"
+      - "--output-signature=${signature}"
+      - "${artifact}"
+      - --yes
 release:
   github:
+  draft: true
+snapshot:
+  version_template: "{{ .Tag }}-dev"
