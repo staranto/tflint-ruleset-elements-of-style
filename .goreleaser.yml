@@ -36,6 +36,7 @@ signs:
       - --use-signing-config
       - --bundle
       - dist/checksums.txt.bundle
+      - "{{ .ArtifactPath }}"
 
 release:
   github:
