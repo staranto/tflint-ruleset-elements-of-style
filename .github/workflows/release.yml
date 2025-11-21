@@ -35,6 +35,11 @@ jobs:
           curl -fsSL -o cosign "${GITHUB_SERVER_URL:-https://github.com}/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign-linux-amd64"
           sudo install -m 0755 cosign "${COSIGN_BIN}"
           cosign version
+
+      - name: Debug cosign
+        run: |
+          which cosign || true
+          cosign version || true
           cosign sign-blob --help || true
 
       - name: Ensure rekor (optional debug)

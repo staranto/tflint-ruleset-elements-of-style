@@ -33,7 +33,7 @@ signs:
     cmd: cosign
     args:
       - sign-blob
-      - --keyless
+      - --use-signing-config
       - --bundle
       - dist/checksums.txt.bundle
 
