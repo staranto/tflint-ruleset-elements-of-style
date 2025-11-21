@@ -15,6 +15,11 @@ import (
 // typeEchoRuleConfig represents the configuration for the TypeEchoRule.
 type typeEchoRuleConfig struct {
 	Synonyms map[string][]string `hclext:"synonyms,optional"`
+	Level    string              `hclext:"level,optional"`
+}
+
+var defaultTypeEchoConfig = typeEchoRuleConfig{
+	Level: "warning",
 }
 
 // TypeEchoRule checks whether a block's type is echoed in its name.
@@ -89,7 +94,9 @@ func checkForEcho(runner tflint.Runner,
 
 // NewTypeEchoRule returns a new rule.
 func NewTypeEchoRule() *TypeEchoRule {
-	return &TypeEchoRule{}
+	rule := &TypeEchoRule{}
+	rule.Config = defaultTypeEchoConfig
+	return rule
 }
 
 // Enabled returns whether the rule is enabled by default.
@@ -109,5 +116,5 @@ func (r *TypeEchoRule) Name() string {
 
 // Severity returns the rule severity.
 func (r *TypeEchoRule) Severity() tflint.Severity {
-	return tflint.WARNING
+	return toSeverity(r.Config.Level)
 }

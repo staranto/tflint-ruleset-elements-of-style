@@ -80,6 +80,16 @@ resource "aws_vpc_security_group_ingress_rule" "ingress" {
 }
 ```
 
+## Configuration
+
+This rule allows customizing the severity level.
+
+```hcl
+rule "eos_type_echo" {
+  level = "warning"
+}
+```
+
 ## How To Fix
 
 Rename the resource block to remove the repetitive jitter. The rule can be ignored with -

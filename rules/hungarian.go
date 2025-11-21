@@ -19,9 +19,15 @@ var defaultHungarianTags = []string{
 	"list", "lst", "set", "map", "arr", "array",
 }
 
+var defaultHungarianConfig = hungarianRuleConfig{
+	Tags:  defaultHungarianTags,
+	Level: "warning",
+}
+
 // hungarianRuleConfig represents the configuration for the HungarianRule.
 type hungarianRuleConfig struct {
-	Tags []string `hclext:"tags,optional"`
+	Tags  []string `hclext:"tags,optional"`
+	Level string   `hclext:"level,optional"`
 }
 
 // HungarianRule checks whether a block's type is echoed in its name.
@@ -56,7 +62,7 @@ func checkForHungarian(runner tflint.Runner, r *HungarianRule, block *hclext.Blo
 // NewHungarianRule returns a new rule.
 func NewHungarianRule() *HungarianRule {
 	rule := &HungarianRule{}
-	rule.Config.Tags = defaultHungarianTags
+	rule.Config = defaultHungarianConfig
 	return rule
 }
 
@@ -77,5 +83,5 @@ func (r *HungarianRule) Name() string {
 
 // Severity returns the rule severity.
 func (r *HungarianRule) Severity() tflint.Severity {
-	return tflint.WARNING
+	return toSeverity(r.Config.Level)
 }

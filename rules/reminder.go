@@ -21,9 +21,15 @@ var defaultReminderTags = []string{
 	"TODO",
 }
 
+var defaultReminderConfig = reminderRuleConfig{
+	Tags:  defaultReminderTags,
+	Level: "warning",
+}
+
 // reminderRuleConfig represents the configuration for the ReminderRule.
 type reminderRuleConfig struct {
-	Tags []string `hclext:"tags,optional"`
+	Tags  []string `hclext:"tags,optional"`
+	Level string   `hclext:"level,optional"`
 }
 
 // ReminderRule checks for reminders.
@@ -95,7 +101,7 @@ func (r *ReminderRule) checkReminders(runner tflint.Runner, filename string, fil
 // NewReminderRule returns a new rule.
 func NewReminderRule() *ReminderRule {
 	rule := &ReminderRule{}
-	rule.Config.Tags = defaultReminderTags
+	rule.Config = defaultReminderConfig
 	return rule
 }
 
@@ -116,5 +122,5 @@ func (r *ReminderRule) Name() string {
 
 // Severity returns the rule severity.
 func (r *ReminderRule) Severity() tflint.Severity {
-	return tflint.WARNING
+	return toSeverity(r.Config.Level)
 }

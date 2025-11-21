@@ -39,6 +39,7 @@ You can add to the defaults:
 ```hcl
 rule "eos_reminder" {
   tags = ["HORROR", "XXX"]
+  level = "warning"
 }
 ```
 

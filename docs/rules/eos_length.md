@@ -34,6 +34,7 @@ The length limit can be customized using the `length` parameter in your `.tflint
 ```hcl
 rule "eos_length" {
   length = 20
+  level = "warning"
 }
 ```
 

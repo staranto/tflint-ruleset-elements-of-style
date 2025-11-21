@@ -38,6 +38,7 @@ You can override the defaults completely:
 ```hcl
 rule "eos_hungarian" {
   defaults = ["foo", "bar"]
+  level = "warning"
 }
 ```
 

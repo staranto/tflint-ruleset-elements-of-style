@@ -47,7 +47,13 @@ All-uppercase names (shouting) can be harder to read and may imply a significanc
 
 ## Configuration
 
-This rule has no configurable parameters.
+This rule allows customizing the severity level.
+
+```hcl
+rule "eos_shout" {
+  level = "warning"
+}
+```
 
 ## How To Fix
 

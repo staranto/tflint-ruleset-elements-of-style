@@ -14,9 +14,15 @@ import (
 // defaultLength is the default maximum length for names.
 const defaultLength = 16
 
+var defaultLengthConfig = lengthRuleConfig{
+	Length: defaultLength,
+	Level:  "warning",
+}
+
 // lengthRuleConfig represents the configuration for the LengthRule.
 type lengthRuleConfig struct {
-	Length int `hclext:"length,optional"`
+	Length int    `hclext:"length,optional"`
+	Level  string `hclext:"level,optional"`
 }
 
 // LengthRule checks whether a block's name is excessively long.
@@ -49,7 +55,7 @@ func checkForLength(runner tflint.Runner, r *LengthRule, block *hclext.Block, _ 
 // NewLengthRule returns a new rule.
 func NewLengthRule() *LengthRule {
 	rule := &LengthRule{}
-	rule.Config.Length = defaultLength
+	rule.Config = defaultLengthConfig
 	return rule
 }
 
@@ -70,5 +76,5 @@ func (rule *LengthRule) Name() string {
 
 // Severity returns the rule severity
 func (rule *LengthRule) Severity() tflint.Severity {
-	return tflint.WARNING
+	return toSeverity(rule.Config.Level)
 }

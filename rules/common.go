@@ -5,6 +5,7 @@ package rules
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/staranto/tflint-ruleset-elements-of-style/terraform"
@@ -120,4 +121,16 @@ func getLocals(runner tflint.Runner) (map[string]*terraform.Local, hcl.Diagnosti
 		return nil, diags
 	}
 	return locals, nil
+}
+
+// toSeverity converts a string level to a tflint.Severity.
+func toSeverity(level string) tflint.Severity {
+	switch strings.ToLower(level) {
+	case "notice":
+		return tflint.NOTICE
+	case "warning":
+		return tflint.WARNING
+	}
+
+	return tflint.ERROR
 }
