@@ -16,7 +16,7 @@ func main() {
 	plugin.Serve(&plugin.ServeOpts{
 		RuleSet: &tflint.BuiltinRuleSet{
 			Name:    "elements-of-style",
-			Version: "0.3.6",
+			Version: "0.3.7",
 			Rules: []tflint.Rule{
 				rules.NewCommentsRule(),
 				rules.NewHungarianRule(),
