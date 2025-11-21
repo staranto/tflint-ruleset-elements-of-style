@@ -52,7 +52,7 @@ Readable comments improve code maintainability. "Jammed" comments (without a spa
 
 This rule allows customizing the check for jammed comments, block comments, and the maximum column length.
 
-By default, jammed comments and block comments are disallowed, and the column limit is 80.
+By default, jammed comments and block comments are disallowed, and the column limit is 80. Lines containing URLs are ignored by the length check by default.
 
 ```hcl
 rule "eos_comments" {
@@ -64,5 +64,11 @@ rule "eos_comments" {
 
   # Change the column limit (set to 0 to disable length check).
   column = 120
+
+  # Disable URL bypass (enforce length check even if line contains a URL).
+  url_bypass = false
+
+  # Set the severity level (notice, warning, error).
+  level = "warning"
 }
 ```

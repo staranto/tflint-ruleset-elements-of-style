@@ -23,3 +23,5 @@ resource "foo" "bar" {
 
 # Short comment.
 
+# This comment is very long but it contains a url http://example.com/very/long/url/that/makes/this/line/exceed/the/limit so it should be ignored.
+

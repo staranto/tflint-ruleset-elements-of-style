@@ -5,6 +5,7 @@ package rules
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
@@ -13,15 +14,23 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
-const defaultCommentsBlocked = true
-const defaultCommentsColumn = 80
-const defaultCommentsJammed = true
+var jammedCommentParser = regexp.MustCompile(`^\s*(//|#|/\*)\S`)
+
+var defaultCommentsConfig = commentsRuleConfig{
+	Block:     true,
+	Column:    80,
+	Jammed:    true,
+	Level:     "warning",
+	URLBypass: true,
+}
 
 // commentsRuleConfig represents the configuration for the CommentsRule.
 type commentsRuleConfig struct {
-	Block  bool `hclext:"block,optional"`
-	Column int  `hclext:"column,optional"`
-	Jammed bool `hclext:"jammed,optional"`
+	Block     bool   `hclext:"block,optional"`
+	Column    int    `hclext:"column,optional"`
+	Jammed    bool   `hclext:"jammed,optional"`
+	Level     string `hclext:"level,optional"`
+	URLBypass bool   `hclext:"url_bypass,optional"`
 }
 
 // CommentsRule checks for comment style.
@@ -81,18 +90,7 @@ func (r *CommentsRule) checkComments(runner tflint.Runner, filename string, file
 
 		// Check for jammed comments if enabled.
 		if r.Config.Jammed {
-			isJammed := false
-			if strings.HasPrefix(text, "//") {
-				if len(text) > 2 && text[2] != ' ' {
-					isJammed = true
-				}
-			} else if strings.HasPrefix(text, "#") {
-				if len(text) > 1 && text[1] != ' ' {
-					isJammed = true
-				}
-			}
-
-			if isJammed {
+			if jammedCommentParser.MatchString(text) {
 				trimmed := strings.TrimSpace(text)
 				rns := []rune(trimmed)
 				snippet := trimmed
@@ -110,6 +108,13 @@ func (r *CommentsRule) checkComments(runner tflint.Runner, filename string, file
 			trimmedText := strings.TrimRight(text, "\r\n")
 			end := token.Range.Start.Column + len(trimmedText) - 1
 
+			if r.Config.URLBypass {
+				// Simple URL detection
+				if strings.Contains(trimmedText, "http://") || strings.Contains(trimmedText, "https://") {
+					continue
+				}
+			}
+
 			if end > r.Config.Column {
 				message := fmt.Sprintf("Comment extends beyond column %d to %d.", r.Config.Column, end)
 				runner.EmitIssue(r, message, token.Range)
@@ -125,11 +130,7 @@ func (r *CommentsRule) checkComments(runner tflint.Runner, filename string, file
 // NewCommentsRule returns a new rule.
 func NewCommentsRule() *CommentsRule {
 	rule := &CommentsRule{}
-	rule.Config = commentsRuleConfig{
-		Block:  defaultCommentsBlocked,
-		Column: defaultCommentsColumn,
-		Jammed: defaultCommentsJammed,
-	}
+	rule.Config = defaultCommentsConfig
 
 	return rule
 }
@@ -151,5 +152,5 @@ func (r *CommentsRule) Name() string {
 
 // Severity returns the rule severity.
 func (r *CommentsRule) Severity() tflint.Severity {
-	return tflint.WARNING
+	return toSeverity(r.Config.Level)
 }
