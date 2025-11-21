@@ -18,6 +18,7 @@ func main() {
 			Name:    "elements-of-style",
 			Version: "0.2.1",
 			Rules: []tflint.Rule{
+				rules.NewCommentsRule(),
 				rules.NewHungarianRule(),
 				rules.NewLengthRule(),
 				rules.NewReminderRule(),

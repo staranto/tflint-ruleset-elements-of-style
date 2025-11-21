@@ -6,6 +6,7 @@ This is a custom TFLint ruleset that enforces both idiomatic conventions and opi
 
 |Name|Description|Severity|Enabled|Link|
 | --- | --- | --- | --- | --- |
+|eos_comments|Enforce simple comment styles.|WARNING|✔|[Link](docs/rules/eos_comments.md)|
 |eos_hungarian|Disallow Hungarian notation in block labels.|WARNING|✔|[Link](docs/rules/eos_hungarian.md)|
 |eos_length|Disallow block labels longer than configurable length (default 16).|WARNING|✔|[Link](docs/rules/eos_length.md)|
 |eos_reminder|Disallow comments containing reminder tags.|WARNING|✔|[Link](docs/rules/eos_reminder.md)|
