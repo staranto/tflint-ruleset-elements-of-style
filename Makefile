@@ -21,7 +21,7 @@ release:
 
 	sed -i 's/\(version = \|Version: \)"[0-9]\+\.[0-9]\+\.[0-9]\+"/\1"$(VERSION)"/' README.md main.go
 	git add README.md main.go
-	git commit --message "Release version $(VERSION)"
+	git diff --cached --quiet || git commit --message "Release version $(VERSION)"
 	git tag v$(VERSION)
 	@echo "Successfully bumped to $(VERSION) and created tag v$(VERSION)."
 	@echo "Run 'git push origin main --tags' to publish."
