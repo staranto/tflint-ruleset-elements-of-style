@@ -41,13 +41,15 @@ func (rule *LengthRule) Check(runner tflint.Runner) error {
 	return CheckBlocksAndLocals(runner, allLintableBlocks, rule, checkForLength)
 }
 
-// checkForLength checks if the type is shouted in the name.
+// checkForLength checks if the name is too long.
 func checkForLength(runner tflint.Runner, r *LengthRule, block *hclext.Block, _ string, name string, _ string) {
 	limit := r.Config.Length
 
 	if len(name) > limit {
 		message := fmt.Sprintf("'%s' is %d characters and should not be longer than %d.", name, len(name), limit)
-		runner.EmitIssue(r, message, block.DefRange)
+		if err := runner.EmitIssue(r, message, block.DefRange); err != nil {
+			logger.Error(err.Error())
+		}
 		logger.Debug(message)
 	}
 }

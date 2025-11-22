@@ -5,10 +5,10 @@ package rules
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
+	"github.com/terraform-linters/tflint-plugin-sdk/logger"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
@@ -39,7 +39,6 @@ type HungarianRule struct {
 // Check checks whether the rule conditions are met.
 func (r *HungarianRule) Check(runner tflint.Runner) error {
 	if err := runner.DecodeRuleConfig(r.Name(), &r.Config); err != nil {
-		fmt.Fprintf(os.Stderr, "failed to decode rule config for %s: %v\n", r.Name(), err)
 		return err
 	}
 
@@ -52,8 +51,10 @@ func checkForHungarian(runner tflint.Runner, r *HungarianRule, block *hclext.Blo
 
 	for _, t := range tags {
 		if strings.HasPrefix(name, t) || strings.HasSuffix(name, t) || strings.Contains(name, "_"+t) {
-			runner.EmitIssue(r, fmt.Sprintf("'%s' uses Hungarian notation with '%s'.", name, t),
-				block.DefRange)
+			if err := runner.EmitIssue(r, fmt.Sprintf("'%s' uses Hungarian notation with '%s'.", name, t),
+				block.DefRange); err != nil {
+				logger.Error(err.Error())
+			}
 			return
 		}
 	}

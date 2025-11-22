@@ -83,7 +83,9 @@ func (r *CommentsRule) checkComments(runner tflint.Runner, filename string, file
 		if r.Config.Block {
 			if strings.HasPrefix(text, "/*") {
 				message := "Block comments not allowed."
-				runner.EmitIssue(r, message, token.Range)
+				if err := runner.EmitIssue(r, message, token.Range); err != nil {
+					logger.Error(err.Error())
+				}
 				logger.Debug(message)
 			}
 		}
@@ -98,7 +100,9 @@ func (r *CommentsRule) checkComments(runner tflint.Runner, filename string, file
 					snippet = string(rns[:5])
 				}
 				message := fmt.Sprintf("Comment is jammed ('%s ...').", snippet)
-				runner.EmitIssue(r, message, token.Range)
+				if err := runner.EmitIssue(r, message, token.Range); err != nil {
+					logger.Error(err.Error())
+				}
 				logger.Debug(message)
 			}
 		}
@@ -117,7 +121,9 @@ func (r *CommentsRule) checkComments(runner tflint.Runner, filename string, file
 
 			if end > r.Config.Column {
 				message := fmt.Sprintf("Comment extends beyond column %d to %d.", r.Config.Column, end)
-				runner.EmitIssue(r, message, token.Range)
+				if err := runner.EmitIssue(r, message, token.Range); err != nil {
+					logger.Error(err.Error())
+				}
 				logger.Debug(message)
 
 			}

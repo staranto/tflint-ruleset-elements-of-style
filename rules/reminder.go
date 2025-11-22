@@ -5,7 +5,6 @@ package rules
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
@@ -41,7 +40,6 @@ type ReminderRule struct {
 // Check checks whether the rule conditions are met.
 func (r *ReminderRule) Check(runner tflint.Runner) error {
 	if err := runner.DecodeRuleConfig(r.Name(), &r.Config); err != nil {
-		fmt.Fprintf(os.Stderr, "failed to decode rule config for %s: %v\n", r.Name(), err)
 		return err
 	}
 
@@ -89,7 +87,9 @@ func (r *ReminderRule) checkReminders(runner tflint.Runner, filename string, fil
 		for _, t := range tags {
 			if strings.HasSuffix(strings.TrimSpace(tokens[0]), t) || strings.HasPrefix(tokens[1], t) {
 				message := fmt.Sprintf("'%s' has a reminder tag.", strings.TrimSpace(text))
-				runner.EmitIssue(r, message, token.Range)
+				if err := runner.EmitIssue(r, message, token.Range); err != nil {
+					logger.Error(err.Error())
+				}
 				logger.Debug(message)
 			}
 		}

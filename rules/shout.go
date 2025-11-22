@@ -30,10 +30,14 @@ type ShoutRule struct {
 
 // Check checks whether the rule conditions are met.
 func (r *ShoutRule) Check(runner tflint.Runner) error {
+	if err := runner.DecodeRuleConfig(r.Name(), &r.Config); err != nil {
+		return err
+	}
+
 	return CheckBlocksAndLocals(runner, allLintableBlocks, r, checkForShout)
 }
 
-// checkForShout checks if the type is shouted in the name.
+// checkForShout checks if the name is shouted.
 func checkForShout(runner tflint.Runner, r *ShoutRule, block *hclext.Block, _ string, name string, _ string) {
 	hasAlpha := false
 	allUpper := true
@@ -49,7 +53,9 @@ func checkForShout(runner tflint.Runner, r *ShoutRule, block *hclext.Block, _ st
 
 	if hasAlpha && allUpper {
 		message := fmt.Sprintf("'%s' should not be all uppercase.", name)
-		runner.EmitIssue(r, message, block.DefRange)
+		if err := runner.EmitIssue(r, message, block.DefRange); err != nil {
+			logger.Error(err.Error())
+		}
 		logger.Debug(message)
 	}
 }

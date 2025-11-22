@@ -5,10 +5,10 @@ package rules
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
+	"github.com/terraform-linters/tflint-plugin-sdk/logger"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
@@ -31,7 +31,6 @@ type TypeEchoRule struct {
 // Check checks whether the rule conditions are met.
 func (r *TypeEchoRule) Check(runner tflint.Runner) error {
 	if err := runner.DecodeRuleConfig(r.Name(), &r.Config); err != nil {
-		fmt.Fprintf(os.Stderr, "failed to decode rule config for %s: %v\n", r.Name(), err)
 		return err
 	}
 
@@ -84,11 +83,13 @@ func checkForEcho(runner tflint.Runner,
 
 	if echo {
 		// logger.Debug(fmt.Sprintf("emiting issue for type='%s' name='%s'", typ, name))
-		runner.EmitIssue(
+		if err := runner.EmitIssue(
 			r,
 			fmt.Sprintf("The type \"%s\" is echoed%s in the label \"%s\".", typ, synonymText, name),
 			block.DefRange,
-		)
+		); err != nil {
+			logger.Error(err.Error())
+		}
 	}
 }
 
