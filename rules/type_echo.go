@@ -58,7 +58,7 @@ func checkForEcho(runner tflint.Runner,
 			break
 		}
 
-		synonyms, _ := r.Config.Synonyms[part]
+		synonyms := r.Config.Synonyms[part]
 		if synonym != "" {
 			synonyms = append(synonyms, synonym)
 		}
