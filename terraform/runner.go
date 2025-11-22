@@ -262,7 +262,7 @@ func (r *Runner) GetProviderRefs() (map[string]*ProviderRef, hcl.Diagnostics) {
 		// For JSON syntax, walker is not implemented,
 		// so extract the hclsyntax.Node that we can walk on.
 		// See https://github.com/hashicorp/hcl/issues/543
-		nodes, diags := r.walkableNodesInExpr(expr)
+		nodes, wDiags := r.walkableNodesInExpr(expr)
 
 		for _, node := range nodes {
 			visitDiags := hclsyntax.VisitAll(node, func(n hclsyntax.Node) hcl.Diagnostics {
@@ -278,9 +278,9 @@ func (r *Runner) GetProviderRefs() (map[string]*ProviderRef, hcl.Diagnostics) {
 				}
 				return nil
 			})
-			diags = diags.Extend(visitDiags)
+			wDiags = wDiags.Extend(visitDiags)
 		}
-		return diags
+		return wDiags
 	}))
 	diags = diags.Extend(walkDiags)
 	if walkDiags.HasErrors() {
