@@ -1,12 +1,12 @@
-.PHONY: default test build install release
+.PHONY: default build check install release test
 
 default: build
 
-test:
-	go test ./...
-
 build:
 	go build
+
+check:
+	tools/check.sh --all
 
 install: build
 	mkdir -p ~/.tflint.d/plugins
@@ -25,3 +25,7 @@ release:
 	git tag v$(VERSION)
 	@echo "Successfully bumped to $(VERSION) and created tag v$(VERSION)."
 	@echo "Run 'git push origin main --tags' to publish."
+
+test:
+	go test ./...
+
