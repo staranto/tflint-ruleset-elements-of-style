@@ -9,9 +9,8 @@ build:
 	go build
 
 install: build
-	@mkdir -p ~/.tflint.d/plugins
-	@mv ./tflint-ruleset-elements-of-style ~/.tflint.d/plugins
-	@echo "Successfully installed tflint-ruleset-elements-of-style to ~/.tflint.d/plugins"
+	mkdir -p ~/.tflint.d/plugins
+	mv ./tflint-ruleset-elements-of-style ~/.tflint.d/plugins
 
 release:
 	@if [ -z "$(VERSION)" ]; then echo "Usage: make release VERSION=x.y.z"; exit 1; fi

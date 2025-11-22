@@ -27,17 +27,6 @@ checksum:
   name_template: "checksums.txt"
   extra_files:
     - glob: ./dist/raw/*
-
-# signs:
-#   - artifacts: checksum
-#     cmd: cosign
-#     args:
-#       - sign-blob
-#       - --use-signing-config
-#       - --bundle
-#       - dist/checksums.txt.bundle
-#       - dist/checksums.txt
-
 release:
   github:
   draft: true
