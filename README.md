@@ -4,14 +4,14 @@ This is a custom TFLint ruleset that enforces both idiomatic conventions and opi
 
 ## Rules
 
-|Name|Description|Severity|Enabled|Link|
-| --- | --- | --- | --- | --- |
-|eos_comments|Enforce simple comment styles.|WARNING|✔|[Link](docs/rules/eos_comments.md)|
-|eos_hungarian|Disallow Hungarian notation in block labels.|WARNING|✔|[Link](docs/rules/eos_hungarian.md)|
-|eos_length|Disallow block labels longer than configurable length (default 16).|WARNING|✔|[Link](docs/rules/eos_length.md)|
-|eos_reminder|Disallow comments containing reminder tags.|WARNING|✔|[Link](docs/rules/eos_reminder.md)|
-|eos_shout|Disallow all-uppercase block labels.|WARNING|✔|[Link](docs/rules/eos_shout.md)|
-|eos_type_echo|Disallow type echoing in block labels.|WARNING|✔|[Link](docs/rules/eos_type_echo.md)|
+|Name|Description|Link|
+| --- | --- | --- |
+|eos_comments|Identify non-standard comment styles.|[Link](docs/rules/eos_comments.md)|
+|eos_hungarian|Identify Hungarian notation in names.|[Link](docs/rules/eos_hungarian.md)|
+|eos_length|Identify names longer than configurable length (default 16).|[Link](docs/rules/eos_length.md)|
+|eos_reminder|Identify comments containing reminder tags.|[Link](docs/rules/eos_reminder.md)|
+|eos_shout|Identify all-uppercase names.|[Link](docs/rules/eos_shout.md)|
+|eos_type_echo|Identify type echoing in names.|[Link](docs/rules/eos_type_echo.md)|
 
 ## Installation
 

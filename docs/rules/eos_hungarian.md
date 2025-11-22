@@ -1,6 +1,6 @@
 # eos_hungarian
 
-Disallow Hungarian notation in block labels.
+Identify Hungarian notation in names.
 
 ## Example
 

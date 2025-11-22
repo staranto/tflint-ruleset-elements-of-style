@@ -1,6 +1,6 @@
 # eos_length
 
-Disallow block labels longer than a configurable length (default 16 characters).
+Identify names longer than a configurable length (default 16 characters).
 
 ## Example
 

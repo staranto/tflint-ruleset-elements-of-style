@@ -1,6 +1,6 @@
 # eos_reminder
 
-Disallow comments containing reminder tags.
+Identify comments containing reminder tags.
 
 ## Example
 

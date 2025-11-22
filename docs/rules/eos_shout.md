@@ -1,6 +1,6 @@
 # eos_shout
 
-Disallow all-uppercase block labels.
+Identify all-uppercase names.
 
 ## Example
 

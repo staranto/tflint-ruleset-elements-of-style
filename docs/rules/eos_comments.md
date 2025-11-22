@@ -1,6 +1,6 @@
 # eos_comments
 
-Enforce comment style: space after comment marker, maximum line length, and no block comments.
+Identify non-standard comment styles: space after comment marker, maximum line length, and no block comments.
 
 ## Example
 

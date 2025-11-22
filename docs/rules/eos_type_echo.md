@@ -1,6 +1,6 @@
 # eos_type_echo
 
-Disallow type echoing in block labels.
+Identify type echoing in names.
 
 ## Example
 
@@ -15,7 +15,7 @@ resource "aws_s3_bucket" "logging-bucket" {
 $ tflint
 1 issue(s) found:
 
-Warning: The type "aws_s3_bucket" is echoed in the label "logging-bucket" (type_echo)
+Warning: The type "aws_s3_bucket" is echoed in the label "logging-bucket" (eos_type_echo)
 
   on config.tf line 1:
   1: resource "aws_s3_bucket" "logging-bucket" {
